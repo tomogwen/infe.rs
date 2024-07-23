@@ -2,6 +2,10 @@
 
 To be rusty dockerised inference of ML models.
 
+## Installation
+
+- `pre-commit install`
+
 ## To Do
 
 - Task queuer (add task to 'tasks' db, update with doing/done).
