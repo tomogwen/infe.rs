@@ -8,9 +8,15 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
-  server:
+  inference:
     build:
-      context: .
+      context: inference/
+      target: final
+    ports:
+      - 8001:8001
+  queuer:
+    build:
+      context: queuer/
       target: final
     ports:
       - 8000:8000
@@ -46,4 +52,4 @@ volumes:
   db-data:
 secrets:
   db-password:
-    file: db/password.txt
+    file: configs/dbsecret.txt

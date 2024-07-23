@@ -3,5 +3,9 @@
 version = 3
 
 [[package]]
-name = "infers"
+name = "inference"
+version = "0.1.0"
+
+[[package]]
+name = "queuer"
 version = "0.1.0"
