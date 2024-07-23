@@ -52,4 +52,4 @@ volumes:
   db-data:
 secrets:
   db-password:
-    file: configs/dbsecret.txt
+    file: configs/dbpassword.txt
