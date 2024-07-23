@@ -13,12 +13,8 @@ async fn echo(req_body: String) -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     println!("Launching webserver");
-    HttpServer::new(|| {
-        App::new()
-            .service(hello)
-            .service(echo)
-    })
-    .bind(("0.0.0.0", 8000))?
-    .run()
-    .await
+    HttpServer::new(|| App::new().service(hello).service(echo))
+        .bind(("0.0.0.0", 8000))?
+        .run()
+        .await
 }
