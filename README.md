@@ -13,8 +13,9 @@ To be rusty dockerised inference of ML models.
 
 ## Building and running your application
 
-Start your application by running:
+- Start the application by running:
 `docker compose up --build`.
+- Run `curl localhost:8000` to get a sample!
 
 ### Hard reset
 
