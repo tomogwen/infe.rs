@@ -1,33 +1,48 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-use deadpool_postgres::Pool;
-
+mod error_enums;
+mod message_structs;
 mod postgres;
 
-#[get("/healthcheck")]
-async fn verify_db_connection(pool: web::Data<Pool>) -> impl Responder {
-    let client = pool.get().await.expect("couldn't get postgres client");
-    let row = client
-        .query_one("SELECT 1", &[])
-        .await
-        .expect("could not query db");
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use deadpool_postgres::Pool;
+use message_structs::{ErrorResponse, HealthCheckResponse, SuccessResponse};
 
-    let mut response_str = String::from("");
-
-    let result: i32 = row.get(0);
-    response_str += if result == 1 {
-        "DB connection is good!\n"
-    } else {
-        "Unexpected result from query.\n"
+#[get("/api/healthcheck")]
+async fn healthcheck_endpoint(pool: web::Data<Pool>) -> impl Responder {
+    let connection_status: bool = match postgres::check_postgres_connection(&pool).await {
+        Ok(connection_status) => connection_status,
+        Err(_) => false,
     };
 
-    let table_exists: bool = postgres::table_exists(&pool, "queue").await;
-    response_str += if table_exists {
-        "Table 'queue' exists.\n"
-    } else {
-        "Table 'queue' does not exist.\n"
+    let table_exists: bool = match postgres::table_exists(&pool, "queue").await {
+        Ok(table_exists) => table_exists,
+        Err(_) => false,
     };
 
-    HttpResponse::Ok().body(response_str)
+    HttpResponse::Ok().json(HealthCheckResponse {
+        db_connection: connection_status,
+        queue_table_exists: table_exists,
+    })
+}
+
+#[post("/api/add-job")]
+async fn add_job_endpoint(request_body: String, pool: web::Data<Pool>) -> impl Responder {
+    match serde_json::from_str(&request_body) {
+        Ok(parsed_request) => match postgres::add_job_to_queue(parsed_request, &pool).await {
+            Ok(_) => HttpResponse::Ok().json(SuccessResponse { success: true }),
+            Err(_) => HttpResponse::Ok().json(SuccessResponse { success: false }),
+        },
+        Err(_) => HttpResponse::BadRequest().json(ErrorResponse {
+            error: String::from("Cannot deserialise request"),
+        }),
+    }
+}
+
+#[get["/api/view-jobs"]]
+async fn view_jobs_endpoint(pool: web::Data<Pool>) -> impl Responder {
+    match postgres::view_jobs_in_queue(&pool).await {
+        Ok(entries) => HttpResponse::Ok().json(entries),
+        Err(_) => HttpResponse::Ok().json(SuccessResponse { success: false }),
+    }
 }
 
 #[actix_web::main]
@@ -36,7 +51,10 @@ async fn main() -> std::io::Result<()> {
     let pool = postgres::create_pool();
 
     // create queue table if required
-    if !postgres::table_exists(&pool, "queue").await {
+    if !postgres::table_exists(&pool, "queue")
+        .await
+        .expect("could not verify if queue table exists to run migration")
+    {
         println!("Creating queue table");
         postgres::migrate_up(&pool).await;
     }
@@ -45,7 +63,9 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone())) // Add pool to application state
-            .service(verify_db_connection)
+            .service(healthcheck_endpoint)
+            .service(add_job_endpoint)
+            .service(view_jobs_endpoint)
     })
     .bind("0.0.0.0:8000")?
     .run()

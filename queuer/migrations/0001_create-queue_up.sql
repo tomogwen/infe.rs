@@ -1,7 +1,8 @@
 CREATE TABLE queue (
     id SERIAL PRIMARY KEY,
     input VARCHAR NOT NULL,
+    user_id VARCHAR NOT NULL,
     being_processed BOOLEAN NOT NULL DEFAULT FALSE,
     complete BOOLEAN NOT NULL DEFAULT FALSE,
-    output VARCHAR
+    output VARCHAR DEFAULT ''
 );
