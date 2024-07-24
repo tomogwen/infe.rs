@@ -2,7 +2,7 @@
 
 This is a WIP repo that aims to implement a rusty task queuer for machine learning model inference, running in dockerised microservices. This came out of wanting to learn about (i) more robust inference of machine learning models - particulary in Rust - and (ii) using docker for deployment of (micro)services.
 
-This project uses three microservices. One is a [standard postgres image](https://hub.docker.com/_/postgres) from Docker. The other two I'm in the process are writing, and will (hopefully!) be a task queuer and a model inference runner.
+This project uses three microservices. One is a [standard postgres image](https://hub.docker.com/_/postgres) from Docker. The other two I'm in the process of writing, and will (hopefully!) be a task queuer and a model inference runner.
 
 ### 📋 Task Queuer
 
