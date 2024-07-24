@@ -4,18 +4,18 @@ This is a WIP repo that aims to implement a rusty task queuer for machine learni
 
 This project uses three microservices. One is a [standard postgres image](https://hub.docker.com/_/postgres) from Docker. The other two I'm in the process are writing, and will (hopefully!) be a task queuer and a model inference runner.
 
-### Task Queuer
+### 📋 Task Queuer
 
 The Task Queuer is currently in progress. It uses a postgres database as the task queue, which it communicates with using [tokio_postgres](https://crates.io/crates/tokio-postgres) and [deadpool_postgres](https://crates.io/crates/deadpool-postgres). It exposes an API using [actix](https://actix.rs/). So far it can:
 - check the connection to the database,
 - add jobs to the queue, and
 - check the jobs on the queue.
 
-### Model Inference Runner
+### ⚡️ Model Inference Runner
 
 To be implemented with [Candle](https://github.com/huggingface/candle)!
 
-## Pre-requisites
+## ⚙️ Pre-requisites
 
 - You will need to [install Rust](https://www.rust-lang.org/learn/get-started) and [Docker](https://docs.docker.com/engine/install/).
 - Docker will install any other pre-requisites when spinning up the containers, but for your piece of mind you may wish to verify the build with:
@@ -28,7 +28,7 @@ cargo build
 pre-commit install
 ```
 
-## Usage
+## 🧑‍💻 Usage
 
 - Start the microservices by running:
 ```
