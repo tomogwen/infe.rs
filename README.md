@@ -17,8 +17,8 @@ To be implemented with [Candle](https://github.com/huggingface/candle)!
 
 ## ⚙️ Pre-requisites
 
-- You will need to [install Rust](https://www.rust-lang.org/learn/get-started) and [Docker](https://docs.docker.com/engine/install/).
-- Docker will install any other pre-requisites when spinning up the containers, but for your piece of mind you may wish to verify the build with:
+- You will need to install [Rust](https://www.rust-lang.org/learn/get-started) and [Docker](https://docs.docker.com/engine/install/).
+- Docker will install any other pre-requisites when spinning up the containers, but you may wish to verify it builds locally with:
 ```
 cargo build
 ```
