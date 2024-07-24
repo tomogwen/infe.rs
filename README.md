@@ -34,5 +34,5 @@ pre-commit install
 ```
 docker compose up --build
 ```
-- Run `curl https://localhost:8000/api/healthcheck` to verify all is well.
+- Run `curl http://localhost:8000/api/healthcheck` to verify all is well.
 - Add some tasks and view them with `scripts/test_api.sh`.
