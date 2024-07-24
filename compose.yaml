@@ -20,6 +20,12 @@ services:
       target: final
     ports:
       - 8000:8000
+    environment:
+      - PG_DBNAME=queue
+      - PG_HOST=db
+      - PG_USER=postgres
+      - PG_PASSWORD=RandomPassword123
+      - RUST_LOG=debug
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
@@ -39,7 +45,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=example
+      - POSTGRES_DB=queue
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
     expose:
       - 5432

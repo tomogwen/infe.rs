@@ -970,6 +970,7 @@ dependencies = [
  "actix-web",
  "deadpool-postgres",
  "tokio-postgres",
+ "tokio-postgres-migration",
 ]
 
 [[package]]
@@ -1317,6 +1318,16 @@ dependencies = [
  "tokio",
  "tokio-util",
  "whoami",
+]
+
+[[package]]
+name = "tokio-postgres-migration"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f4cbd11616abaecba7df0fa9c35929b70e41d8198db394ae22626aa68e252a4"
+dependencies = [
+ "log",
+ "tokio-postgres",
 ]
 
 [[package]]
