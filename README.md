@@ -1,24 +1,38 @@
-# Infe.rs
+# 🦀 Infe.rs
 
-To be rusty dockerised inference of ML models.
+This is a WIP repo that aims to implement a rusty task queuer for machine learning model inference, running in dockerised microservices. This came out of wanting to learn about (i) more robust inference of machine learning models - particulary in Rust - and (ii) using docker for deployment of (micro)services.
 
-## Installation
+This project uses three microservices. One is a [standard postgres image](https://hub.docker.com/_/postgres) from Docker. The other two I'm in the process are writing, and will (hopefully!) be a task queuer and a model inference runner.
 
-- `pre-commit install`
+### 📋 Task Queuer
 
-## To Do
+The Task Queuer is currently in progress. It uses a postgres database as the task queue, which it communicates with using [tokio_postgres](https://crates.io/crates/tokio-postgres) and [deadpool_postgres](https://crates.io/crates/deadpool-postgres). It exposes an API using [actix](https://actix.rs/). So far it can:
+- check the connection to the database,
+- add jobs to the queue, and
+- check the jobs on the queue.
 
-- Task queuer (add task to 'tasks' db, update with doing/done).
-- Model inference.
+### ⚡️ Model Inference Runner
 
-## Building and running your application
+To be implemented with [Candle](https://github.com/huggingface/candle)!
 
-- Start the application by running:
-`docker compose up --build`.
-- Run `curl localhost:8000` to get a sample!
+## ⚙️ Pre-requisites
 
-### Hard reset
+- You will need to install [Rust](https://www.rust-lang.org/learn/get-started) and [Docker](https://docs.docker.com/engine/install/).
+- Docker will install any other pre-requisites when spinning up the containers, but you may wish to verify it builds locally with:
+```
+cargo build
+```
 
-- `docker compose down`
-- `docker rm -f $(docker ps -a -q)`
-- `docker volume rm $(docker volume ls -q)`
+- If developing, please install pre-commit checks:
+```
+pre-commit install
+```
+
+## 🧑‍💻 Usage
+
+- Start the microservices by running:
+```
+docker compose up --build
+```
+- Run `curl https://localhost:8000/api/healthcheck` to verify all is well.
+- Add some tasks and view them with `scripts/test_api.sh`.
