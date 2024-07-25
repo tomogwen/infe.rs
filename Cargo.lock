@@ -686,6 +686,15 @@ dependencies = [
 [[package]]
 name = "inference"
 version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "deadpool-postgres",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "thiserror",
+ "tokio-postgres",
+]
 
 [[package]]
 name = "itoa"
