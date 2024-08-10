@@ -30,7 +30,7 @@ pre-commit install
 
 ## 🧑‍💻 Usage
 
-- Build and run the microservices by running:
+- Build and run the microservices with:
 ```
 docker compose up --build
 ```
