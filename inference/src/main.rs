@@ -1,50 +1,56 @@
+mod bert;
 mod error_enums;
 mod message_structs;
 mod postgres;
 
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-use deadpool_postgres::Pool;
-use message_structs::{HealthCheckResponse, SuccessResponse};
+use deadpool_postgres::Pool as DeadPool;
+use message_structs::QueueEntry;
+use tokio::time::{sleep, Duration};
 
-#[get("/api/healthcheck")]
-async fn healthcheck_endpoint(pool: web::Data<Pool>) -> impl Responder {
-    let connection_status: bool = match postgres::check_postgres_connection(&pool).await {
-        Ok(connection_status) => connection_status,
-        Err(_) => false,
-    };
-
-    let table_exists: bool = match postgres::table_exists(&pool, "queue").await {
-        Ok(table_exists) => table_exists,
-        Err(_) => false,
-    };
-
-    HttpResponse::Ok().json(HealthCheckResponse {
-        db_connection: connection_status,
-        queue_table_exists: table_exists,
-    })
+fn main() {
+    bert::main();
 }
 
-#[get["/api/view-jobs"]]
-async fn view_jobs_endpoint(pool: web::Data<Pool>) -> impl Responder {
-    match postgres::view_jobs_in_queue(&pool).await {
-        Ok(entries) => HttpResponse::Ok().json(entries),
-        Err(_) => HttpResponse::Ok().json(SuccessResponse { success: false }),
+/*
+async fn process_queue(tasks: Vec<QueueEntry>, pool: &DeadPool) {
+    for task in tasks {
+        if !task.being_processed && !task.complete {
+            /*match model::run_inference(task.input) {
+                Ok(output) => postgres::update_row(task.id, output, pool),
+                Err(_) => {},
+            }*/
+        }
     }
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    println!("Creating pool");
-    let pool = postgres::create_pool();
-
-    println!("Launching webserver");
-    HttpServer::new(move || {
-        App::new()
-            .app_data(web::Data::new(pool.clone())) // Add pool to application state
-            .service(healthcheck_endpoint)
-            .service(view_jobs_endpoint)
-    })
-    .bind("0.0.0.0:8001")?
-    .run()
-    .await
+async fn runner(pool: DeadPool) {
+    // loop every second
+    loop {
+        match postgres::view_jobs_in_queue(&pool).await {
+            Ok(queue) => {
+                let tasks: Vec<QueueEntry> = queue.queue_entries;
+                // find most recent unperformed job
+                process_queue(tasks, &pool).await;
+            }
+            Err(_) => {}
+        }
+        sleep(Duration::from_secs(1)).await;
+    }
 }
+
+#[tokio::main]
+async fn main() {
+    let pool = postgres::create_pool();
+    if !(postgres::check_postgres_connection(&pool)
+        .await
+        .expect("could not connect to db")
+        && postgres::table_exists(&pool, "queue")
+            .await
+            .expect("could not verify table exists"))
+    {
+        panic!("could not verify postgres")
+    }
+    println!("connected to database");
+
+    runner(pool).await;
+}*/
