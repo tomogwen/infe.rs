@@ -1,31 +1,20 @@
 services:
-  inference:
+#  inference:
+#  add inference service using
+  backend:
     build:
-      context: inference/
-      target: final
-    ports:
-      - 8001:8001
-    environment:
-      - PG_DBNAME=queue
-      - PG_HOST=db
-      - PG_USER=postgres
-      - PG_PASSWORD=RandomPassword123
-      - RUST_LOG=debug
-    depends_on:
-      queuer:
-        condition: service_started
-  queuer:
-    build:
-      context: queuer/
+      context: services/backend/
       target: final
     ports:
       - 8000:8000
+    env_file:
+      - .env
     environment:
-      - PG_DBNAME=queue
-      - PG_HOST=db
-      - PG_USER=postgres
-      - PG_PASSWORD=RandomPassword123
-      - RUST_LOG=debug
+      - PG_DBNAME=${PG_DBNAME}
+      - PG_HOST=${PG_HOST}
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - RUST_LOG=${RUST_LOG}
     depends_on:
       db:
         condition: service_healthy
@@ -33,13 +22,14 @@ services:
     image: postgres
     restart: always
     user: postgres
-    secrets:
-      - db-password
     volumes:
       - db-data:/var/lib/postgresql/data
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=queue
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - POSTGRES_DB=${PG_DBNAME}
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
     expose:
       - 5432
     healthcheck:
@@ -49,6 +39,3 @@ services:
       retries: 5
 volumes:
   db-data:
-secrets:
-  db-password:
-    file: configs/dbpassword.txt
